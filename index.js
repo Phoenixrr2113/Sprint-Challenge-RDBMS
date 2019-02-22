@@ -75,9 +75,21 @@ server.get('/api/projects', (req, res) => {
 
 server.get('/api/projects/:id', (req, res) => {
 	db('projects')
-		.where({ id: req.params.id })
-		.then(project => {
-			res.status(200).json(project);
+		.join('actions', 'project_id', '=', 'actions.project_id')
+
+		.select(
+			'actions.description',
+			'actions.completed',
+			'actions.comment as notes',
+		)
+		.where('actions.project_id', req.params.id)
+
+		.then(actions => {
+			db('projects')
+				.where({ id: req.params.id })
+				.then(project => {
+					res.status(200).json({ project, actions });
+				});
 		})
 		.catch(err => res.status(500).json(err));
 });

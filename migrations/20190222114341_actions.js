@@ -6,9 +6,16 @@ exports.up = function(knex, Promise) {
 
 		table.string('comment', 255);
 
-		table.boolean('completed').notNullable();
+		table
+			.integer('project_id')
+			.notNullable()
+			.unsigned()
+			.references('id')
+			.inTable('projects')
+			.onDelete('CASCADE')
+			.onUpdate('CASCADE');
 
-		table.timestamps(true, true);
+		table.boolean('completed').notNullable();
 	});
 };
 
